@@ -1,4 +1,3 @@
-debugger;
 const config = require('./config/secrets');
 const google = require('googleapis');
 
@@ -6,7 +5,13 @@ const google = require('googleapis');
  * DB
 */
 const dbDeets = require('./config/db');
-// const MongoStore = require('connect-mongo')(express);
+const db = require('monk')(dbDeets.conn);
+const Users = db.get('users');
+// Implement MongoStore.
+// https://github.com/kcbanner/connect-mongo
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+
 
 /*
  * Auth Providers
@@ -20,7 +25,7 @@ passport.use(new GoogleStrategy({
   },
   function(accessToken, refreshToken, profile, cb) {
     debugger;
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    Users.findOrCreate({ googleId: profile.id }, function (err, user) {
       return cb(err, user);
     });
   }
@@ -64,17 +69,21 @@ app.use(logger('dev'))
   .use(bodyParser.urlencoded({ extended: false }))
   .use(cookieParser())
   .use(express.static(path.join(__dirname, 'public')))
-  // TODO:
-  // Implement DB session store.
-  /*
-  .use(express.session({
+  .use(session({
+      name: 'session',
+      resave: false, // https://github.com/expressjs/session#resave
+      secret: cuid(),
       store: new MongoStore({
         url: dbDeets.sessionsStore
-      }),
-      secret: cuid()
+      })
     })
   );
-*/
+
+// TODO:
+// https://github.com/passport/express-4.x-facebook-example/blob/master/server.js
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
