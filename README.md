@@ -9,3 +9,4 @@ https://birthdaytexts.scm.azurewebsites.net/DebugConsole
 
 # TODO
 http://gregerg.com/using-node-inspector-with-nodemon/
+https://www.nczonline.net/blog/2016/03/mimicking-npm-script-in-node-js
